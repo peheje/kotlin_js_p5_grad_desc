@@ -32,9 +32,9 @@ class Polynomial {
     }
 
     fun drawPoly(cs: CoordinateSystem) {
-        val min = -cs.xtickNum / 2
-        val max = cs.xtickNum / 2
-        val drawStep = 0.001
+        val min = cs.minX
+        val max = cs.maxX
+        val drawStep = 0.005
 
         var x: Double = min.toDouble()
         while (x < max) {

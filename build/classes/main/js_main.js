@@ -44,6 +44,8 @@ var js_main = function (_, Kotlin) {
     this.w2_0 = width / 2;
     this.h2_0 = height / 2;
     this.xtickNum = 10;
+    this.minX = -10 / 2.0;
+    this.maxX = this.xtickNum / 2.0;
     this.ytickNum_0 = 10;
     this.xtick_0 = 0;
     this.ytick_0 = 0;
@@ -336,9 +338,9 @@ var js_main = function (_, Kotlin) {
     return Math.pow(x, coefficient);
   };
   Polynomial.prototype.drawPoly_82vlsp$ = function (cs_0) {
-    var min = -10 / 2 | 0;
-    var max = cs_0.xtickNum / 2 | 0;
-    var drawStep = 0.001;
+    var min = cs_0.minX;
+    var max = cs_0.maxX;
+    var drawStep = 0.005;
     var x = min;
     while (x < max) {
       cs_0.drawPoint_yrtduw$(new Coordinate(x, this.eval_14dthe$(x)));
