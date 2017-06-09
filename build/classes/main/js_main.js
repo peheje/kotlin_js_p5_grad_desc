@@ -223,6 +223,8 @@ var js_main = function (_, Kotlin) {
   }
   function main(args) {
     println((new Date()).toString());
+    var r = [-100.0, -1.0, 0.0, 25.0, 50.0];
+    println(binarySearch(r, 51.0));
   }
   function mousePressed() {
     println('mouse pressed');

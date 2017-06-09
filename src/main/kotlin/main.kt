@@ -1,5 +1,4 @@
 import kotlin.js.Date
-import kotlin.js.Math
 
 val width: Double = 600.0
 val height: Double = 600.0
@@ -13,28 +12,10 @@ var best: Specimen = Specimen(Polynomial(order))
 val gd: GradientDescent = GradientDescent(learningRate = 0.00001)
 var ge: Pool = Pool(poolsize)
 
-fun Math.randomBetween(min: Double, max: Double): Double {
-    return Math.random() * (max - min) + min
-}
-
-fun DoubleArray.binarySearch(el: Double): Int {
-    var m = 0
-    var n = this.size - 1
-    while (m <= n) {
-        var k = (n + m) / 2
-        if (el > this[k]) {
-            m = k + 1
-        } else if (el < this[k]) {
-            n = k - 1
-        } else {
-            return k
-        }
-    }
-    return -m - 1
-}
-
 fun main(args: Array<String>) {
     println(Date().toString())
+    val r = doubleArrayOf(-100.0, -1.0, 0.0, 25.0, 50.0)
+    println(r.binarySearch(51.0))
 }
 
 fun mousePressed() {
