@@ -7,7 +7,9 @@ class Polynomial {
 
     constructor(order: Int) {
         this.order = order
-        this.betas = DoubleArray(order) { Math.random() }
+        this.betas = DoubleArray(order) {
+            Math.randomBetween(-5.0, 5.0)
+        }
         this.velos = DoubleArray(order) { 0.0 }
     }
     fun eval(x: Double): Double {
@@ -18,6 +20,9 @@ class Polynomial {
             p *= x
         }
         return sum
+    }
+    fun gradient(x: Double, coefficient: Int): Double {
+        return Math.pow(x, coefficient.toDouble())
     }
     fun drawPoly(cs: CoordinateSystem) {
         val min = -cs.xtickNum / 2

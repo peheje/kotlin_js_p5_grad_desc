@@ -1,13 +1,18 @@
 import kotlin.js.Date
+import kotlin.js.Math
 
 val width: Double = 600.0
 val height: Double = 600.0
 val order: Int = 3
 var best: Specimen = Specimen(Polynomial(order))
-val gd: GradientDescent = GradientDescent()
+val gd: GradientDescent = GradientDescent(learningRate = 0.00001)
 val cs: CoordinateSystem = CoordinateSystem()
 val fps = 0
-val poolsize = 100
+val poolsize = 1000
+
+fun Math.randomBetween(min: Double, max: Double): Double {
+    return Math.random() * (max - min) + min
+}
 
 fun main(args: Array<String>) {
     println(Date().toString())
@@ -36,6 +41,7 @@ fun draw() {
         val ge = Genetic(poolsize)
         val bestGenetic = ge.findbest()
         if (bestGenetic.fitness > best.fitness) {
+            println("Genetic found best")
             best = bestGenetic
         }
         gd.run()

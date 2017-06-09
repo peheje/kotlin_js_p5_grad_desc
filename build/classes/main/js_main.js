@@ -192,9 +192,9 @@ var js_main = function (_, Kotlin) {
     return new Specimen(Polynomial_init(order));
   }
   function GradientDescent() {
-    this.descentStrategy = DescentStrategy$Momentum_getInstance();
-    this.friction = 0.95;
-    this.learningRate = 1.0E-4;
+    this.friction = 0;
+    this.learningRate = 0;
+    this.descentStrategy = null;
   }
   GradientDescent.prototype.run = function () {
     var tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5;
@@ -212,11 +212,11 @@ var js_main = function (_, Kotlin) {
         error = y - best.poly.eval_14dthe$(x);
         tmp$_5 = this.descentStrategy;
         if (Kotlin.equals(tmp$_5, DescentStrategy$Momentum_getInstance())) {
-          best.poly.velos[i] = best.poly.velos[i] * this.friction + this.learningRate * Math.pow(x, i) * error;
+          best.poly.velos[i] = best.poly.velos[i] * this.friction + this.learningRate * best.poly.gradient_12fank$(x, i) * error;
           best.poly.betas[i] = best.poly.betas[i] + best.poly.velos[i];
         }
          else if (Kotlin.equals(tmp$_5, DescentStrategy$SGD_getInstance()))
-          best.poly.betas[i] = best.poly.betas[i] + Math.pow(x, i) * error * this.learningRate;
+          best.poly.betas[i] = best.poly.betas[i] + best.poly.gradient_12fank$(x, i) * error * this.learningRate;
       }
     }
   };
@@ -225,6 +225,20 @@ var js_main = function (_, Kotlin) {
     simpleName: 'GradientDescent',
     interfaces: []
   };
+  function GradientDescent_init(friction, learningRate, descentStrategy, $this) {
+    if (friction === void 0)
+      friction = 0.95;
+    if (learningRate === void 0)
+      learningRate = 1.0E-4;
+    if (descentStrategy === void 0)
+      descentStrategy = DescentStrategy$Momentum_getInstance();
+    $this = $this || Object.create(GradientDescent.prototype);
+    GradientDescent.call($this);
+    $this.friction = friction;
+    $this.descentStrategy = descentStrategy;
+    $this.learningRate = learningRate;
+    return $this;
+  }
   var width;
   var height;
   var order;
@@ -233,6 +247,9 @@ var js_main = function (_, Kotlin) {
   var cs;
   var fps;
   var poolsize;
+  function randomBetween($receiver, min, max) {
+    return Math.random() * (max - min) + min;
+  }
   function main(args) {
     println((new Date()).toString());
   }
@@ -256,6 +273,7 @@ var js_main = function (_, Kotlin) {
       var ge = Genetic_init(poolsize);
       var bestGenetic = ge.findbest();
       if (bestGenetic.fitness > best.fitness) {
+        println('Genetic found best');
         best = bestGenetic;
       }
       gd.run();
@@ -287,6 +305,9 @@ var js_main = function (_, Kotlin) {
     }
     return sum;
   };
+  Polynomial.prototype.gradient_12fank$ = function (x, coefficient) {
+    return Math.pow(x, coefficient);
+  };
   Polynomial.prototype.drawPoly_82vlsp$ = function (cs_0) {
     var min = -10 / 2 | 0;
     var max = cs_0.xtickNum / 2 | 0;
@@ -311,7 +332,7 @@ var js_main = function (_, Kotlin) {
     return $this;
   }
   function Polynomial_init$lambda(it) {
-    return Math.random();
+    return randomBetween(Math, -5.0, 5.0);
   }
   function Polynomial_init$lambda_0(it) {
     return 0.0;
@@ -350,6 +371,7 @@ var js_main = function (_, Kotlin) {
   _.DescentStrategy = DescentStrategy;
   _.Genetic_init_za3lpa$ = Genetic_init;
   _.Genetic = Genetic;
+  _.GradientDescent_init_la7mwf$ = GradientDescent_init;
   _.GradientDescent = GradientDescent;
   Object.defineProperty(_, 'width', {
     get: function () {
@@ -394,6 +416,7 @@ var js_main = function (_, Kotlin) {
       return poolsize;
     }
   });
+  _.randomBetween_iht2in$ = randomBetween;
   _.main_kand9s$ = main;
   _.mousePressed = mousePressed;
   _.setup = setup;
@@ -405,10 +428,10 @@ var js_main = function (_, Kotlin) {
   height = 600.0;
   order = 3;
   best = new Specimen(Polynomial_init(order));
-  gd = new GradientDescent();
+  gd = GradientDescent_init(void 0, 1.0E-5);
   cs = CoordinateSystem_init();
   fps = 0;
-  poolsize = 100;
+  poolsize = 1000;
   Kotlin.defineModule('js_main', _);
   main([]);
   return _;
