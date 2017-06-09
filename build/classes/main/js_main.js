@@ -285,6 +285,7 @@ var js_main = function (_, Kotlin) {
   }
   function setup() {
     frameRate(fps);
+    noSmooth();
     println('very setup');
     createCanvas(width + 1 | 0, height + 1 | 0);
   }
@@ -641,7 +642,7 @@ var js_main = function (_, Kotlin) {
   _.Pool_init_za3lpa$ = Pool_init;
   _.Pool = Pool;
   _.Specimen = Specimen;
-  width = 600.0;
+  width = 800.0;
   height = 600.0;
   order = 4;
   fps = 0;

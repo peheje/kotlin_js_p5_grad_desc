@@ -1,6 +1,6 @@
 import kotlin.js.Date
 
-val width: Double = 600.0
+val width: Double = 800.0
 val height: Double = 600.0
 
 val order: Int = 4
@@ -36,6 +36,7 @@ fun mousePressed() {
 
 fun setup() {
     frameRate(fps)
+    noSmooth()
     println("very setup")
     createCanvas((width + 1).toInt(), (height + 1).toInt())
 }

@@ -6,5 +6,6 @@ external fun stroke(color: Int)
 external fun ellipse(x: Double, y: Double, w: Double, h: Double)
 external fun point(x: Double, y: Double)
 external fun frameRate(fps: Int)
+external fun noSmooth()
 external var mouseX: Double
 external var mouseY: Double
