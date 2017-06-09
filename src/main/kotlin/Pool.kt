@@ -8,10 +8,6 @@ class Pool {
         this.data.forEach { it.calcfitness() }
     }
 
-    constructor(data: Array<Specimen>) {
-        this.data = data
-    }
-
     fun findbest(): Specimen {
         return data.maxBy { it.fitness }!!
     }

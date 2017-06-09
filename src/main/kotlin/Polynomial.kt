@@ -42,4 +42,8 @@ class Polynomial {
             x += drawStep
         }
     }
+
+    fun resetVelocity() {
+        for (i in 0 until velos.size) velos[i] = 0.0
+    }
 }

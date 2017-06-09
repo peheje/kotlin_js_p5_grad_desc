@@ -219,6 +219,7 @@ var js_main = function (_, Kotlin) {
   var poolsize;
   var mutateProp;
   var mutateFreq;
+  var betterThreshold;
   var cs;
   var best;
   var gd;
@@ -248,7 +249,8 @@ var js_main = function (_, Kotlin) {
     stroke(0);
     if (cs.data_0.size > 1) {
       var wheel = Pool$Companion_getInstance().wheel_1hfzw$(pool);
-      pool = Pool_init_0(Kotlin.newArrayF(poolsize, draw$lambda(wheel)));
+      pool.data = Kotlin.newArrayF(poolsize, draw$lambda(wheel));
+      pool.data[0] = best.copy();
       var $receiver = pool.data;
       var tmp$;
       for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
@@ -263,9 +265,9 @@ var js_main = function (_, Kotlin) {
         element_0.calcfitness();
       }
       var bestGenetic = pool.findbest();
-      if (bestGenetic.fitness > best.fitness) {
-        println('Best picked from genetic pool.');
-        best = bestGenetic;
+      if (bestGenetic.fitness - best.fitness > betterThreshold) {
+        println('Best picked from genetic pool. If this happens too often, turn down learning');
+        best = bestGenetic.copy();
       }
       gd.run();
       best.calcfitness();
@@ -309,6 +311,15 @@ var js_main = function (_, Kotlin) {
       cs_0.drawPoint_yrtduw$(new Coordinate(x, this.eval_14dthe$(x)));
       x += drawStep;
     }
+  };
+  Polynomial.prototype.resetVelocity = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2;
+    tmp$ = until(0, this.velos.length);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var i = tmp$_0; i <= tmp$_1; i += tmp$_2)
+      this.velos[i] = 0.0;
   };
   Polynomial.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -421,12 +432,6 @@ var js_main = function (_, Kotlin) {
   function Pool_init$lambda(it) {
     return new Specimen(Polynomial_init(order));
   }
-  function Pool_init_0(data, $this) {
-    $this = $this || Object.create(Pool.prototype);
-    Pool.call($this);
-    $this.data = data;
-    return $this;
-  }
   function Specimen(poly) {
     this.poly = poly;
     this.fitness = -1.0;
@@ -513,6 +518,11 @@ var js_main = function (_, Kotlin) {
       return mutateFreq;
     }
   });
+  Object.defineProperty(_, 'betterThreshold', {
+    get: function () {
+      return betterThreshold;
+    }
+  });
   Object.defineProperty(_, 'cs', {
     get: function () {
       return cs;
@@ -550,19 +560,19 @@ var js_main = function (_, Kotlin) {
     get: Pool$Companion_getInstance
   });
   _.Pool_init_za3lpa$ = Pool_init;
-  _.Pool_init_wa9mqu$ = Pool_init_0;
   _.Pool = Pool;
   _.Specimen = Specimen;
   width = 600.0;
   height = 600.0;
-  order = 3;
+  order = 4;
   fps = 0;
   poolsize = 1000;
-  mutateProp = 0.1;
-  mutateFreq = 0.1;
+  mutateProp = 0.2;
+  mutateFreq = 0.25;
+  betterThreshold = 0.01;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  gd = GradientDescent_init(0.99, 1.0E-4);
+  gd = GradientDescent_init(0.95, 1.0E-6);
   pool = Pool_init(poolsize);
   Kotlin.defineModule('js_main', _);
   main([]);
