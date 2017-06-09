@@ -13,9 +13,21 @@ class Specimen (val poly: Polynomial) {
         return Specimen(clone)
     }
 
-    fun mutate(mutateFreq: Double) {
+    fun mutate(mutateFreq: Double, strength: Double) {
         for (i in 0 until poly.betas.size)
             if (Math.random() < mutateFreq)
-                poly.betas[i] += Math.randomBetween(-5.0, 5.0)
+                poly.betas[i] += Math.randomBetween(-strength, strength)
+    }
+
+    fun crossover(crossoverFreq: Double, maxCrossover: Double = 0.1) {
+        val mate: Specimen = pool.data[Math.randomBetween(0, poolsize)]
+        for (i in 0 until poly.betas.size) {
+            if (Math.random() < crossoverFreq)
+                poly.betas[i] = lerp(poly.betas[i], mate.poly.betas[i], Math.randomBetween(0.0, maxCrossover))
+        }
+    }
+
+    private fun lerp(a: Double, b: Double, p: Double): Double {
+        return a + (b - a) * p
     }
 }

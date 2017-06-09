@@ -147,6 +147,11 @@ var js_main = function (_, Kotlin) {
   function randomBetween($receiver, min, max) {
     return $receiver.random() * (max - min) + min;
   }
+  function randomBetween_0($receiver, min, max) {
+    var min_0 = Math.ceil(min);
+    var max_0 = Math.floor(max);
+    return Math.floor(Math.random() * (max_0 - min_0 | 0)) + min_0 | 0;
+  }
   function binarySearch($receiver, el) {
     var m = 0;
     var n = $receiver.length - 1 | 0;
@@ -219,6 +224,10 @@ var js_main = function (_, Kotlin) {
   var poolsize;
   var mutateProp;
   var mutateFreq;
+  var mutateStrength;
+  var crossoverProp;
+  var crossoverFreq;
+  var maxCrossover;
   var betterThreshold;
   var cs;
   var best;
@@ -256,17 +265,30 @@ var js_main = function (_, Kotlin) {
       for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
         var element = $receiver[tmp$];
         if (Math.random() < mutateProp)
-          element.mutate_14dthe$(mutateFreq);
+          element.mutate_lu1900$(mutateFreq, mutateStrength);
       }
       var $receiver_0 = pool.data;
       var tmp$_0;
       for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
         var element_0 = $receiver_0[tmp$_0];
-        element_0.calcfitness();
+        if (Math.random() < crossoverProp)
+          element_0.crossover_lu1900$(crossoverFreq, maxCrossover);
+      }
+      var $receiver_1 = pool.data;
+      var tmp$_1;
+      for (tmp$_1 = 0; tmp$_1 !== $receiver_1.length; ++tmp$_1) {
+        var element_1 = $receiver_1[tmp$_1];
+        element_1.calcfitness();
       }
       var bestGenetic = pool.findbest();
       if (bestGenetic.fitness - best.fitness > betterThreshold) {
         println('Best picked from genetic pool. If this happens too often, turn down learning');
+        var $receiver_2 = pool.data;
+        var tmp$_2;
+        for (tmp$_2 = 0; tmp$_2 !== $receiver_2.length; ++tmp$_2) {
+          var element_2 = $receiver_2[tmp$_2];
+          element_2.poly.resetVelocity();
+        }
         best = bestGenetic.copy();
       }
       gd.run();
@@ -451,7 +473,7 @@ var js_main = function (_, Kotlin) {
     var clone = Polynomial_init_0(order, this.poly.betas, this.poly.velos);
     return new Specimen(clone);
   };
-  Specimen.prototype.mutate_14dthe$ = function (mutateFreq_0) {
+  Specimen.prototype.mutate_lu1900$ = function (mutateFreq_0, strength) {
     var tmp$, tmp$_0, tmp$_1, tmp$_2;
     tmp$ = until(0, this.poly.betas.length);
     tmp$_0 = tmp$.first;
@@ -459,7 +481,24 @@ var js_main = function (_, Kotlin) {
     tmp$_2 = tmp$.step;
     for (var i = tmp$_0; i <= tmp$_1; i += tmp$_2)
       if (Math.random() < mutateFreq_0)
-        this.poly.betas[i] = this.poly.betas[i] + randomBetween(Math, -5.0, 5.0);
+        this.poly.betas[i] = this.poly.betas[i] + randomBetween(Math, -strength, strength);
+  };
+  Specimen.prototype.crossover_lu1900$ = function (crossoverFreq_0, maxCrossover_0) {
+    if (maxCrossover_0 === void 0)
+      maxCrossover_0 = 0.1;
+    var tmp$, tmp$_0, tmp$_1, tmp$_2;
+    var mate = pool.data[randomBetween_0(Math, 0, poolsize)];
+    tmp$ = until(0, this.poly.betas.length);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var i = tmp$_0; i <= tmp$_1; i += tmp$_2) {
+      if (Math.random() < crossoverFreq_0)
+        this.poly.betas[i] = this.lerp_0(this.poly.betas[i], mate.poly.betas[i], randomBetween(Math, 0.0, maxCrossover_0));
+    }
+  };
+  Specimen.prototype.lerp_0 = function (a, b, p) {
+    return a + (b - a) * p;
   };
   Specimen.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -480,6 +519,7 @@ var js_main = function (_, Kotlin) {
   });
   _.DescentStrategy = DescentStrategy;
   _.randomBetween_iht2in$ = randomBetween;
+  _.randomBetween_przh2b$ = randomBetween_0;
   _.binarySearch_taaqy$ = binarySearch;
   _.GradientDescent_init_la7mwf$ = GradientDescent_init;
   _.GradientDescent = GradientDescent;
@@ -516,6 +556,26 @@ var js_main = function (_, Kotlin) {
   Object.defineProperty(_, 'mutateFreq', {
     get: function () {
       return mutateFreq;
+    }
+  });
+  Object.defineProperty(_, 'mutateStrength', {
+    get: function () {
+      return mutateStrength;
+    }
+  });
+  Object.defineProperty(_, 'crossoverProp', {
+    get: function () {
+      return crossoverProp;
+    }
+  });
+  Object.defineProperty(_, 'crossoverFreq', {
+    get: function () {
+      return crossoverFreq;
+    }
+  });
+  Object.defineProperty(_, 'maxCrossover', {
+    get: function () {
+      return maxCrossover;
     }
   });
   Object.defineProperty(_, 'betterThreshold', {
@@ -569,6 +629,10 @@ var js_main = function (_, Kotlin) {
   poolsize = 1000;
   mutateProp = 0.2;
   mutateFreq = 0.25;
+  mutateStrength = 1.0;
+  crossoverProp = 0.4;
+  crossoverFreq = 0.2;
+  maxCrossover = 0.1;
   betterThreshold = 0.01;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));

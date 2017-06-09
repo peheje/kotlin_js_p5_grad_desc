@@ -4,6 +4,11 @@ fun Math.randomBetween(min: Double, max: Double): Double {
     return random() * (max - min) + min
 }
 
+fun Math.randomBetween(min: Int, max: Int): Int {
+    val min = Math.ceil(min)
+    val max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min)) + min
+}
 fun DoubleArray.binarySearch(el: Double): Int {
     var m = 0
     var n = this.size - 1
