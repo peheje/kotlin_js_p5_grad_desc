@@ -144,6 +144,26 @@ var js_main = function (_, Kotlin) {
     }
   }
   DescentStrategy.valueOf_61zpoe$ = DescentStrategy$valueOf;
+  function randomBetween($receiver, min, max) {
+    return $receiver.random() * (max - min) + min;
+  }
+  function binarySearch($receiver, el) {
+    var m = 0;
+    var n = $receiver.length - 1 | 0;
+    while (m <= n) {
+      var k = Math.floor((n + m | 0) / 2 | 0);
+      if (el > $receiver[k]) {
+        m = k + 1 | 0;
+      }
+       else if (el < $receiver[k]) {
+        n = k - 1 | 0;
+      }
+       else {
+        return k;
+      }
+    }
+    return -m - 1 | 0;
+  }
   function GradientDescent() {
     this.friction = 0;
     this.learningRate = 0;
@@ -197,37 +217,16 @@ var js_main = function (_, Kotlin) {
   var order;
   var fps;
   var poolsize;
+  var mutateProp;
+  var mutateFreq;
   var cs;
   var best;
   var gd;
-  var ge;
-  function randomBetween($receiver, min, max) {
-    return Math.random() * (max - min) + min;
-  }
-  function binarySearch($receiver, el) {
-    var m = 0;
-    var n = $receiver.length - 1 | 0;
-    while (m <= n) {
-      var k = (n + m | 0) / 2 | 0;
-      if (el > $receiver[k]) {
-        m = k + 1 | 0;
-      }
-       else if (el < $receiver[k]) {
-        n = k - 1 | 0;
-      }
-       else {
-        return k;
-      }
-    }
-    return -m - 1 | 0;
-  }
+  var pool;
   function main(args) {
     println((new Date()).toString());
-    var r = [-100.0, -1.0, 0.0, 25.0, 50.0];
-    println(binarySearch(r, 51.0));
   }
   function mousePressed() {
-    println('mouse pressed');
     if (mouseX < width && mouseY < height) {
       var coord = cs.toCoordinate_yrtduw$(new Coordinate(mouseX, mouseY));
       cs.data_0.add_11rb$(coord);
@@ -238,17 +237,38 @@ var js_main = function (_, Kotlin) {
     println('very setup');
     var canvas = createCanvas(width + 1 | 0, height + 1 | 0);
   }
+  function draw$lambda(closure$wheel) {
+    return function (it) {
+      return Pool$Companion_getInstance().pick_d9oydx$(pool, closure$wheel);
+    };
+  }
   function draw() {
     background(153);
     fill(255);
     stroke(0);
     if (cs.data_0.size > 1) {
-      var bestGenetic = ge.findbest();
+      var wheel = Pool$Companion_getInstance().wheel_1hfzw$(pool);
+      pool = Pool_init_0(Kotlin.newArrayF(poolsize, draw$lambda(wheel)));
+      var $receiver = pool.data;
+      var tmp$;
+      for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+        var element = $receiver[tmp$];
+        if (Math.random() < mutateProp)
+          element.mutate_14dthe$(mutateFreq);
+      }
+      var $receiver_0 = pool.data;
+      var tmp$_0;
+      for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
+        var element_0 = $receiver_0[tmp$_0];
+        element_0.calcfitness();
+      }
+      var bestGenetic = pool.findbest();
       if (bestGenetic.fitness > best.fitness) {
-        println('Pool found best');
+        println('Best picked from genetic pool.');
         best = bestGenetic;
       }
       gd.run();
+      best.calcfitness();
       cs.drawGrid();
       cs.drawPoints();
       best.poly.drawPoly_82vlsp$(cs);
@@ -309,13 +329,21 @@ var js_main = function (_, Kotlin) {
   function Polynomial_init$lambda_0(it) {
     return 0.0;
   }
+  function Polynomial_init_0(order_0, betas, velos, $this) {
+    $this = $this || Object.create(Polynomial.prototype);
+    Polynomial.call($this);
+    $this.order_0 = order_0;
+    $this.betas = betas.slice();
+    $this.velos = velos.slice();
+    return $this;
+  }
   function Pool() {
     Pool$Companion_getInstance();
-    this.data_0 = null;
+    this.data = null;
   }
   Pool.prototype.findbest = function () {
     var tmp$;
-    var $receiver = this.data_0;
+    var $receiver = this.data;
     var maxBy$result;
     maxBy$break: {
       var tmp$_0;
@@ -343,19 +371,23 @@ var js_main = function (_, Kotlin) {
   }
   function Pool$Companion$wheel$lambda(closure$pool, closure$sum) {
     return function (i) {
-      closure$sum.v += closure$pool.data_0[i].fitness;
+      closure$sum.v += closure$pool.data[i].fitness;
       return closure$sum.v;
     };
   }
-  Pool$Companion.prototype.wheel_1hfzw$ = function (pool) {
+  Pool$Companion.prototype.wheel_1hfzw$ = function (pool_0) {
     var sum = {v: 0.0};
-    var wheel = Kotlin.newArrayF(pool.data_0.length, Pool$Companion$wheel$lambda(pool, sum));
+    var wheel = Kotlin.newArrayF(pool_0.data.length, Pool$Companion$wheel$lambda(pool_0, sum));
     return wheel;
   };
-  Pool$Companion.prototype.pick_d9oydx$ = function (pool, wheel) {
+  Pool$Companion.prototype.pick_d9oydx$ = function (pool_0, wheel) {
     var sum = last(wheel);
     var r = randomBetween(Math, 0.0, sum);
-    var idx = wheel;
+    var idx = binarySearch(wheel, r);
+    if (idx < 0) {
+      idx = -idx - 1 | 0;
+    }
+    return pool_0.data[idx].copy();
   };
   Pool$Companion.$metadata$ = {
     kind: Kotlin.Kind.OBJECT,
@@ -377,8 +409,8 @@ var js_main = function (_, Kotlin) {
   function Pool_init(poolsize_0, $this) {
     $this = $this || Object.create(Pool.prototype);
     Pool.call($this);
-    $this.data_0 = Kotlin.newArrayF(poolsize_0, Pool_init$lambda);
-    var $receiver = $this.data_0;
+    $this.data = Kotlin.newArrayF(poolsize_0, Pool_init$lambda);
+    var $receiver = $this.data;
     var tmp$;
     for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var element = $receiver[tmp$];
@@ -388,6 +420,12 @@ var js_main = function (_, Kotlin) {
   }
   function Pool_init$lambda(it) {
     return new Specimen(Polynomial_init(order));
+  }
+  function Pool_init_0(data, $this) {
+    $this = $this || Object.create(Pool.prototype);
+    Pool.call($this);
+    $this.data = data;
+    return $this;
   }
   function Specimen(poly) {
     this.poly = poly;
@@ -401,7 +439,22 @@ var js_main = function (_, Kotlin) {
       var element = tmp$.next();
       sum_23 += Math.pow(this.poly.eval_14dthe$(element.x) - element.y, 2.0);
     }
-    this.fitness = 1.0 / (1.0 + sum_23);
+    var errorSq = sum_23;
+    this.fitness = 1.0 / (1.0 + errorSq);
+  };
+  Specimen.prototype.copy = function () {
+    var clone = Polynomial_init_0(order, this.poly.betas, this.poly.velos);
+    return new Specimen(clone);
+  };
+  Specimen.prototype.mutate_14dthe$ = function (mutateFreq_0) {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2;
+    tmp$ = until(0, this.poly.betas.length);
+    tmp$_0 = tmp$.first;
+    tmp$_1 = tmp$.last;
+    tmp$_2 = tmp$.step;
+    for (var i = tmp$_0; i <= tmp$_1; i += tmp$_2)
+      if (Math.random() < mutateFreq_0)
+        this.poly.betas[i] = this.poly.betas[i] + randomBetween(Math, -5.0, 5.0);
   };
   Specimen.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
@@ -421,6 +474,8 @@ var js_main = function (_, Kotlin) {
     get: DescentStrategy$Nesterov_getInstance
   });
   _.DescentStrategy = DescentStrategy;
+  _.randomBetween_iht2in$ = randomBetween;
+  _.binarySearch_taaqy$ = binarySearch;
   _.GradientDescent_init_la7mwf$ = GradientDescent_init;
   _.GradientDescent = GradientDescent;
   Object.defineProperty(_, 'width', {
@@ -448,6 +503,16 @@ var js_main = function (_, Kotlin) {
       return poolsize;
     }
   });
+  Object.defineProperty(_, 'mutateProp', {
+    get: function () {
+      return mutateProp;
+    }
+  });
+  Object.defineProperty(_, 'mutateFreq', {
+    get: function () {
+      return mutateFreq;
+    }
+  });
   Object.defineProperty(_, 'cs', {
     get: function () {
       return cs;
@@ -466,26 +531,26 @@ var js_main = function (_, Kotlin) {
       return gd;
     }
   });
-  Object.defineProperty(_, 'ge', {
+  Object.defineProperty(_, 'pool', {
     get: function () {
-      return ge;
+      return pool;
     },
     set: function (value) {
-      ge = value;
+      pool = value;
     }
   });
-  _.randomBetween_iht2in$ = randomBetween;
-  _.binarySearch_taaqy$ = binarySearch;
   _.main_kand9s$ = main;
   _.mousePressed = mousePressed;
   _.setup = setup;
   _.draw = draw;
   _.Polynomial_init_za3lpa$ = Polynomial_init;
+  _.Polynomial_init_js5yta$ = Polynomial_init_0;
   _.Polynomial = Polynomial;
   Object.defineProperty(Pool, 'Companion', {
     get: Pool$Companion_getInstance
   });
   _.Pool_init_za3lpa$ = Pool_init;
+  _.Pool_init_wa9mqu$ = Pool_init_0;
   _.Pool = Pool;
   _.Specimen = Specimen;
   width = 600.0;
@@ -493,10 +558,12 @@ var js_main = function (_, Kotlin) {
   order = 3;
   fps = 0;
   poolsize = 1000;
+  mutateProp = 0.1;
+  mutateFreq = 0.1;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  gd = GradientDescent_init(void 0, 1.0E-5);
-  ge = Pool_init(poolsize);
+  gd = GradientDescent_init(0.99, 1.0E-4);
+  pool = Pool_init(poolsize);
   Kotlin.defineModule('js_main', _);
   main([]);
   return _;

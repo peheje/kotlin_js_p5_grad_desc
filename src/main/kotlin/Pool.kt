@@ -1,11 +1,15 @@
 import kotlin.js.Math
 
 class Pool {
-    private var data: Array<Specimen>
+    var data: Array<Specimen>
 
     constructor(poolsize: Int) {
         this.data = Array(poolsize) { Specimen(Polynomial(order)) }
         this.data.forEach { it.calcfitness() }
+    }
+
+    constructor(data: Array<Specimen>) {
+        this.data = data
     }
 
     fun findbest(): Specimen {
@@ -19,10 +23,14 @@ class Pool {
             return wheel
         }
 
-        fun pick(pool: Pool, wheel: DoubleArray) {
+        fun pick(pool: Pool, wheel: DoubleArray): Specimen {
             val sum = wheel.last()
             val r = Math.randomBetween(0.0, sum)
-            var idx = wheel
+            var idx = wheel.binarySearch(r)
+            if (idx < 0) {
+                idx = -idx - 1
+            }
+            return pool.data[idx].copy()
         }
     }
 }
