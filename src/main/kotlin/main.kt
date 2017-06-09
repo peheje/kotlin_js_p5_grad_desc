@@ -5,7 +5,7 @@ val height: Double = 600.0
 
 val order: Int = 4
 val fps = 0
-val poolsize = 1000
+val poolsize = 100
 
 val mutateProp = 0.5
 val mutateFreq = 0.25
@@ -15,11 +15,11 @@ val crossoverProp = 0.4
 val crossoverFreq = 0.8
 val maxCrossover = 0.3
 
-val betterThreshold = 0.0001
+val betterThreshold = 0.001
 
 val cs: CoordinateSystem = CoordinateSystem()
 var best: Specimen = Specimen(Polynomial(order))
-val descent: GradientDescent = GradientDescent(learningRate = 0.000001, friction = 0.95)
+val descent: GradientDescent = GradientDescent(learningRate = 0.000001, friction = 0.99)
 var pool: Pool = Pool(poolsize)
 val genetic: Genetic = Genetic()
 

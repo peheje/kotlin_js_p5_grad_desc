@@ -43,10 +43,10 @@ var js_main = function (_, Kotlin) {
     this.data_0 = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
     this.w2_0 = width / 2;
     this.h2_0 = height / 2;
-    this.xtickNum = 10;
-    this.minX = -10 / 2.0;
-    this.maxX = this.xtickNum / 2.0;
+    this.xtickNum_0 = 10;
     this.ytickNum_0 = 10;
+    this.minX = -10 / 2.0;
+    this.maxX = this.xtickNum_0 / 2.0;
     this.xtick_0 = 0;
     this.ytick_0 = 0;
   }
@@ -54,7 +54,7 @@ var js_main = function (_, Kotlin) {
     var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4, tmp$_5, tmp$_6;
     line(this.w2_0, 0.0, this.w2_0, height);
     line(0.0, this.h2_0, width, this.h2_0);
-    tmp$ = until(0, this.xtickNum);
+    tmp$ = until(0, this.xtickNum_0);
     tmp$_0 = tmp$.first;
     tmp$_1 = tmp$.last;
     tmp$_2 = tmp$.step;
@@ -94,7 +94,7 @@ var js_main = function (_, Kotlin) {
   function CoordinateSystem_init($this) {
     $this = $this || Object.create(CoordinateSystem.prototype);
     CoordinateSystem.call($this);
-    $this.xtick_0 = width / $this.xtickNum;
+    $this.xtick_0 = width / $this.xtickNum_0;
     $this.ytick_0 = width / $this.ytickNum_0;
     return $this;
   }
@@ -646,17 +646,17 @@ var js_main = function (_, Kotlin) {
   height = 600.0;
   order = 4;
   fps = 0;
-  poolsize = 1000;
+  poolsize = 100;
   mutateProp = 0.5;
   mutateFreq = 0.25;
   mutateStrength = 0.5;
   crossoverProp = 0.4;
   crossoverFreq = 0.8;
   maxCrossover = 0.3;
-  betterThreshold = 1.0E-4;
+  betterThreshold = 0.001;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  descent = GradientDescent_init(0.95, 1.0E-6);
+  descent = GradientDescent_init(0.8, 1.0E-6);
   pool = Pool_init(poolsize);
   genetic = new Genetic();
   Kotlin.defineModule('js_main', _);

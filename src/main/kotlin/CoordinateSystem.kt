@@ -2,10 +2,10 @@ class CoordinateSystem {
     internal val data: MutableList<Coordinate> = mutableListOf()
     private val w2: Double = width / 2
     private val h2: Double = height / 2
-    val xtickNum: Int = 10
+    private val xtickNum: Int = 10
+    private val ytickNum: Int = 10
     val minX = -xtickNum / 2.0
     val maxX = xtickNum / 2.0
-    private val ytickNum: Int = 10
     private val xtick: Double
     private val ytick: Double
 
