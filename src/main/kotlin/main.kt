@@ -2,13 +2,15 @@ import kotlin.js.Date
 
 val width: Double = 600.0
 val height: Double = 600.0
-val pl: Polynomial = Polynomial(3)
-val gd: GradientDescent = GradientDescent(pl)
+val order: Int = 3
+var best: Specimen = Specimen(Polynomial(order))
+val gd: GradientDescent = GradientDescent()
 val cs: CoordinateSystem = CoordinateSystem()
-val fps = 1
+val fps = 0
+val poolsize = 100
 
 fun main(args: Array<String>) {
-    println(Date().getTime())
+    println(Date().toString())
 }
 
 fun mousePressed() {
@@ -31,13 +33,17 @@ fun draw() {
     stroke(0)
 
     if (cs.data.size > 1) {
+        val ge = Genetic(poolsize)
+        val bestGenetic = ge.findbest()
+        if (bestGenetic.fitness > best.fitness) {
+            best = bestGenetic
+        }
         gd.run()
         cs.drawGrid()
         cs.drawPoints()
-        pl.drawPoly(cs)
+        best.poly.drawPoly(cs)
     } else {
         cs.drawGrid()
         cs.drawPoints()
     }
 }
-

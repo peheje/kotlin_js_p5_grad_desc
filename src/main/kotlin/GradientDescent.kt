@@ -1,29 +1,25 @@
 import kotlin.js.Math
 
 class GradientDescent {
-    private val p: Polynomial
 
-    constructor(pl: Polynomial) {
-        this.p = pl
-    }
     val descentStrategy = DescentStrategy.Momentum
-    val friction = 0.9
+    val friction = 0.95
     val learningRate = 0.0001
     fun run() {
         for ((x, y) in cs.data) {
             var error: Double
-            for (i in 0 until p.betas.size) {
-                error = y - p.eval(x)
+            for (i in 0 until best.poly.betas.size) {
+                error = y - best.poly.eval(x)
 
                 // pow(x, i) will be the gradient for the i'th coefficient:
                 when (descentStrategy) {
                     DescentStrategy.Momentum -> {
                         // Momentum
-                        p.velocities[i] = p.velocities[i] * friction + learningRate * Math.pow(x, i.toDouble()) * error
-                        p.betas[i] += p.velocities[i]
+                        best.poly.velos[i] = best.poly.velos[i] * friction + learningRate * Math.pow(x, i.toDouble()) * error
+                        best.poly.betas[i] += best.poly.velos[i]
                     }
                     DescentStrategy.SGD -> {
-                        p.betas[i] += Math.pow(x, i.toDouble()) * error * learningRate;
+                        best.poly.betas[i] += Math.pow(x, i.toDouble()) * error * learningRate;
                     }
                 }
 

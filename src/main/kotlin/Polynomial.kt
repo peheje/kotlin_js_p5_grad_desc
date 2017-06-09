@@ -3,12 +3,12 @@ import kotlin.js.Math
 class Polynomial {
     private val order: Int
     val betas: DoubleArray
-    val velocities: DoubleArray
+    val velos: DoubleArray
 
     constructor(order: Int) {
         this.order = order
         this.betas = DoubleArray(order) { Math.random() }
-        this.velocities = DoubleArray(order) { 0.0 }
+        this.velos = DoubleArray(order) { 0.0 }
     }
     fun eval(x: Double): Double {
         var sum = 0.0
