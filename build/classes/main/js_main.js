@@ -148,9 +148,9 @@ var js_main = function (_, Kotlin) {
     return $receiver.random() * (max - min) + min;
   }
   function randomBetween_0($receiver, min, max) {
-    var min_0 = Math.ceil(min);
-    var max_0 = Math.floor(max);
-    return Math.floor(Math.random() * (max_0 - min_0 | 0)) + min_0 | 0;
+    var minimum = Math.ceil(min);
+    var maximum = Math.floor(max);
+    return Math.floor(Math.random() * (maximum - minimum | 0)) + minimum | 0;
   }
   function binarySearch($receiver, el) {
     var m = 0;
@@ -169,6 +169,44 @@ var js_main = function (_, Kotlin) {
     }
     return -m - 1 | 0;
   }
+  function Genetic() {
+  }
+  function Genetic$run$lambda(closure$wheel) {
+    return function (it) {
+      return Pool$Companion_getInstance().pick_d9oydx$(pool, closure$wheel);
+    };
+  }
+  Genetic.prototype.run = function () {
+    var wheel = Pool$Companion_getInstance().wheel_1hfzw$(pool);
+    pool.data = Kotlin.newArrayF(poolsize, Genetic$run$lambda(wheel));
+    pool.data[0] = best.copy();
+    var $receiver = pool.data;
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+      var element = $receiver[tmp$];
+      if (Math.random() < mutateProp)
+        element.mutate_lu1900$(mutateFreq, mutateStrength);
+    }
+    var $receiver_0 = pool.data;
+    var tmp$_0;
+    for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
+      var element_0 = $receiver_0[tmp$_0];
+      if (Math.random() < crossoverProp)
+        element_0.crossover_lu1900$(crossoverFreq, maxCrossover);
+    }
+    var $receiver_1 = pool.data;
+    var tmp$_1;
+    for (tmp$_1 = 0; tmp$_1 !== $receiver_1.length; ++tmp$_1) {
+      var element_1 = $receiver_1[tmp$_1];
+      element_1.calcfitness();
+    }
+    return pool.findbest();
+  };
+  Genetic.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Genetic',
+    interfaces: []
+  };
   function GradientDescent() {
     this.friction = 0;
     this.learningRate = 0;
@@ -231,8 +269,9 @@ var js_main = function (_, Kotlin) {
   var betterThreshold;
   var cs;
   var best;
-  var gd;
+  var descent;
   var pool;
+  var genetic;
   function main(args) {
     println((new Date()).toString());
   }
@@ -245,53 +284,25 @@ var js_main = function (_, Kotlin) {
   function setup() {
     frameRate(fps);
     println('very setup');
-    var canvas = createCanvas(width + 1 | 0, height + 1 | 0);
-  }
-  function draw$lambda(closure$wheel) {
-    return function (it) {
-      return Pool$Companion_getInstance().pick_d9oydx$(pool, closure$wheel);
-    };
+    createCanvas(width + 1 | 0, height + 1 | 0);
   }
   function draw() {
     background(153);
     fill(255);
     stroke(0);
     if (cs.data_0.size > 1) {
-      var wheel = Pool$Companion_getInstance().wheel_1hfzw$(pool);
-      pool.data = Kotlin.newArrayF(poolsize, draw$lambda(wheel));
-      pool.data[0] = best.copy();
-      var $receiver = pool.data;
-      var tmp$;
-      for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-        var element = $receiver[tmp$];
-        if (Math.random() < mutateProp)
-          element.mutate_lu1900$(mutateFreq, mutateStrength);
-      }
-      var $receiver_0 = pool.data;
-      var tmp$_0;
-      for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
-        var element_0 = $receiver_0[tmp$_0];
-        if (Math.random() < crossoverProp)
-          element_0.crossover_lu1900$(crossoverFreq, maxCrossover);
-      }
-      var $receiver_1 = pool.data;
-      var tmp$_1;
-      for (tmp$_1 = 0; tmp$_1 !== $receiver_1.length; ++tmp$_1) {
-        var element_1 = $receiver_1[tmp$_1];
-        element_1.calcfitness();
-      }
-      var bestGenetic = pool.findbest();
+      var bestGenetic = genetic.run();
       if (bestGenetic.fitness - best.fitness > betterThreshold) {
         println('Best picked from genetic pool. If this happens too often, turn down learning');
-        var $receiver_2 = pool.data;
-        var tmp$_2;
-        for (tmp$_2 = 0; tmp$_2 !== $receiver_2.length; ++tmp$_2) {
-          var element_2 = $receiver_2[tmp$_2];
-          element_2.poly.resetVelocity();
+        var $receiver = pool.data;
+        var tmp$;
+        for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+          var element = $receiver[tmp$];
+          element.poly.resetVelocity();
         }
         best = bestGenetic.copy();
       }
-      gd.run();
+      descent.run();
       best.calcfitness();
       cs.drawGrid();
       cs.drawPoints();
@@ -521,6 +532,7 @@ var js_main = function (_, Kotlin) {
   _.randomBetween_iht2in$ = randomBetween;
   _.randomBetween_przh2b$ = randomBetween_0;
   _.binarySearch_taaqy$ = binarySearch;
+  _.Genetic = Genetic;
   _.GradientDescent_init_la7mwf$ = GradientDescent_init;
   _.GradientDescent = GradientDescent;
   Object.defineProperty(_, 'width', {
@@ -596,9 +608,9 @@ var js_main = function (_, Kotlin) {
       best = value;
     }
   });
-  Object.defineProperty(_, 'gd', {
+  Object.defineProperty(_, 'descent', {
     get: function () {
-      return gd;
+      return descent;
     }
   });
   Object.defineProperty(_, 'pool', {
@@ -607,6 +619,11 @@ var js_main = function (_, Kotlin) {
     },
     set: function (value) {
       pool = value;
+    }
+  });
+  Object.defineProperty(_, 'genetic', {
+    get: function () {
+      return genetic;
     }
   });
   _.main_kand9s$ = main;
@@ -624,9 +641,9 @@ var js_main = function (_, Kotlin) {
   _.Specimen = Specimen;
   width = 600.0;
   height = 600.0;
-  order = 6;
+  order = 4;
   fps = 0;
-  poolsize = 5000;
+  poolsize = 1000;
   mutateProp = 0.5;
   mutateFreq = 0.25;
   mutateStrength = 0.5;
@@ -636,8 +653,9 @@ var js_main = function (_, Kotlin) {
   betterThreshold = 1.0E-4;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  gd = GradientDescent_init(0.95, 1.0E-9);
+  descent = GradientDescent_init(0.95, 1.0E-6);
   pool = Pool_init(poolsize);
+  genetic = new Genetic();
   Kotlin.defineModule('js_main', _);
   main([]);
   return _;

@@ -5,9 +5,9 @@ fun Math.randomBetween(min: Double, max: Double): Double {
 }
 
 fun Math.randomBetween(min: Int, max: Int): Int {
-    val min = Math.ceil(min)
-    val max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min)) + min
+    val minimum = Math.ceil(min)
+    val maximum = Math.floor(max)
+    return Math.floor(Math.random() * (maximum - minimum)) + minimum
 }
 fun DoubleArray.binarySearch(el: Double): Int {
     var m = 0

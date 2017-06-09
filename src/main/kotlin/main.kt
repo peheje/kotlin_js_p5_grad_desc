@@ -1,12 +1,11 @@
 import kotlin.js.Date
-import kotlin.js.Math
 
 val width: Double = 600.0
 val height: Double = 600.0
 
-val order: Int = 6
+val order: Int = 4
 val fps = 0
-val poolsize = 5000
+val poolsize = 1000
 
 val mutateProp = 0.5
 val mutateFreq = 0.25
@@ -20,8 +19,9 @@ val betterThreshold = 0.0001
 
 val cs: CoordinateSystem = CoordinateSystem()
 var best: Specimen = Specimen(Polynomial(order))
-val gd: GradientDescent = GradientDescent(learningRate = 0.000000001, friction = 0.95)
+val descent: GradientDescent = GradientDescent(learningRate = 0.000001, friction = 0.95)
 var pool: Pool = Pool(poolsize)
+val genetic: Genetic = Genetic()
 
 fun main(args: Array<String>) {
     println(Date().toString())
@@ -37,9 +37,8 @@ fun mousePressed() {
 fun setup() {
     frameRate(fps)
     println("very setup")
-    val canvas = createCanvas((width + 1).toInt(), (height + 1).toInt())
+    createCanvas((width + 1).toInt(), (height + 1).toInt())
 }
-
 
 fun draw() {
     background(153)
@@ -47,21 +46,13 @@ fun draw() {
     stroke(0)
 
     if (cs.data.size > 1) {
-        val wheel = Pool.wheel(pool)
-        pool.data = Array(poolsize) { Pool.pick(pool, wheel) }
-        pool.data[0] = best.copy()
-
-        pool.data.forEach { if (Math.random() < mutateProp) it.mutate(mutateFreq, mutateStrength) }
-        pool.data.forEach { if (Math.random() < crossoverProp) it.crossover(crossoverFreq, maxCrossover) }
-        pool.data.forEach { it.calcfitness() }
-
-        val bestGenetic = pool.findbest()
+        val bestGenetic = genetic.run()
         if (bestGenetic.fitness - best.fitness > betterThreshold) {
             println("Best picked from genetic pool. If this happens too often, turn down learning")
             pool.data.forEach { it.poly.resetVelocity() }
             best = bestGenetic.copy()
         }
-        gd.run()
+        descent.run()
         best.calcfitness()
 
         // Draw
