@@ -4,22 +4,23 @@ import kotlin.js.Math
 val width: Double = 600.0
 val height: Double = 600.0
 
-val order: Int = 4
+val order: Int = 6
 val fps = 0
-val poolsize = 1000
-val mutateProp = 0.2
+val poolsize = 5000
+
+val mutateProp = 0.5
 val mutateFreq = 0.25
-val mutateStrength = 1.0
+val mutateStrength = 0.5
 
 val crossoverProp = 0.4
-val crossoverFreq = 0.2
-val maxCrossover = 0.1
+val crossoverFreq = 0.8
+val maxCrossover = 0.3
 
-val betterThreshold = 0.01
+val betterThreshold = 0.0001
 
 val cs: CoordinateSystem = CoordinateSystem()
 var best: Specimen = Specimen(Polynomial(order))
-val gd: GradientDescent = GradientDescent(learningRate = 0.000001, friction = 0.95)
+val gd: GradientDescent = GradientDescent(learningRate = 0.000000001, friction = 0.95)
 var pool: Pool = Pool(poolsize)
 
 fun main(args: Array<String>) {
