@@ -6,6 +6,7 @@ var js_main = function (_, Kotlin) {
   var until = Kotlin.kotlin.ranges.until_dqglrj$;
   var Enum = Kotlin.kotlin.Enum;
   var println = Kotlin.kotlin.io.println_s8jyv4$;
+  var step = Kotlin.kotlin.ranges.step_xsgg7u$;
   var last = Kotlin.kotlin.collections.last_bvy38s$;
   DescentStrategy.prototype = Object.create(Enum.prototype);
   DescentStrategy.prototype.constructor = DescentStrategy;
@@ -339,13 +340,24 @@ var js_main = function (_, Kotlin) {
     return Math.pow(x, coefficient);
   };
   Polynomial.prototype.drawPoly_82vlsp$ = function (cs_0) {
+    var tmp$;
     var min = cs_0.minX;
     var max = cs_0.maxX;
-    var drawStep = 0.005;
+    var drawStep = 0.1;
     var x = min;
+    var y;
+    var list = Kotlin.kotlin.collections.ArrayList_init_ww73n8$();
     while (x < max) {
-      cs_0.drawPoint_yrtduw$(new Coordinate(x, this.eval_14dthe$(x)));
+      y = this.eval_14dthe$(x);
       x += drawStep;
+      list.add_11rb$(new Coordinate(x, y));
+    }
+    tmp$ = step(until(0, list.size - 1 | 0), 1).iterator();
+    while (tmp$.hasNext()) {
+      var i = tmp$.next();
+      var p1 = cs_0.toPixel_yrtduw$(list.get_za3lpa$(i));
+      var p2 = cs_0.toPixel_yrtduw$(list.get_za3lpa$(i + 1 | 0));
+      line(p1.x, p1.y, p2.x, p2.y);
     }
   };
   Polynomial.prototype.resetVelocity = function () {
@@ -644,11 +656,11 @@ var js_main = function (_, Kotlin) {
   _.Specimen = Specimen;
   width = 800.0;
   height = 600.0;
-  order = 4;
+  order = 5;
   fps = 0;
-  poolsize = 100;
+  poolsize = 1000;
   mutateProp = 0.5;
-  mutateFreq = 0.25;
+  mutateFreq = 0.4;
   mutateStrength = 0.5;
   crossoverProp = 0.4;
   crossoverFreq = 0.8;
@@ -656,7 +668,7 @@ var js_main = function (_, Kotlin) {
   betterThreshold = 0.001;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  descent = GradientDescent_init(0.8, 1.0E-6);
+  descent = GradientDescent_init(0.99, 1.0E-7);
   pool = Pool_init(poolsize);
   genetic = new Genetic();
   Kotlin.defineModule('js_main', _);

@@ -1,4 +1,4 @@
-external fun line(x1: Double, y1: Double, x2: Double, y2: Double): dynamic
+external fun line(x1: Double, y1: Double, x2: Double, y2: Double)
 external fun createCanvas(width: Int, height: Int)
 external fun background(color: Int)
 external fun fill(color: Int)

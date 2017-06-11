@@ -34,12 +34,21 @@ class Polynomial {
     fun drawPoly(cs: CoordinateSystem) {
         val min = cs.minX
         val max = cs.maxX
-        val drawStep = 0.005
+        val drawStep = 0.1
 
-        var x: Double = min.toDouble()
+        var x: Double = min
+        var y: Double
+        val list = mutableListOf<Coordinate>()
+
         while (x < max) {
-            cs.drawPoint(Coordinate(x, eval(x)))
+            y = eval(x)
             x += drawStep
+            list.add(Coordinate(x, y))
+        }
+        for (i in 0 until list.size-1 step 1) {
+            val p1 = cs.toPixel(list[i])
+            val p2 = cs.toPixel(list[i+1])
+            line(p1.x, p1.y, p2.x, p2.y)
         }
     }
 

@@ -3,12 +3,12 @@ import kotlin.js.Date
 val width: Double = 800.0
 val height: Double = 600.0
 
-val order: Int = 4
+val order: Int = 5
 val fps = 0
-val poolsize = 100
+val poolsize = 1000
 
 val mutateProp = 0.5
-val mutateFreq = 0.25
+val mutateFreq = 0.4
 val mutateStrength = 0.5
 
 val crossoverProp = 0.4
@@ -19,7 +19,7 @@ val betterThreshold = 0.001
 
 val cs: CoordinateSystem = CoordinateSystem()
 var best: Specimen = Specimen(Polynomial(order))
-val descent: GradientDescent = GradientDescent(learningRate = 0.000001, friction = 0.99)
+val descent: GradientDescent = GradientDescent(learningRate = 1e-7, friction = 0.99)
 var pool: Pool = Pool(poolsize)
 val genetic: Genetic = Genetic()
 
@@ -47,7 +47,8 @@ fun draw() {
     stroke(0)
 
     if (cs.data.size > 1) {
-        val bestGenetic = genetic.run()
+
+        var bestGenetic = genetic.run()
         if (bestGenetic.fitness - best.fitness > betterThreshold) {
             println("Best picked from genetic pool. If this happens too often, turn down learning")
             pool.data.forEach { it.poly.resetVelocity() }
