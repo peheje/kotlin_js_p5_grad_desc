@@ -180,7 +180,25 @@ var js_main = function (_, Kotlin) {
     }
     return -m - 1 | 0;
   }
-  function Genetic() {
+  function Genetic(mutateProp, mutateFreq, mutateStrength, crossoverProp, crossoverFreq, maxCrossover) {
+    if (mutateProp === void 0)
+      mutateProp = 0.5;
+    if (mutateFreq === void 0)
+      mutateFreq = 0.4;
+    if (mutateStrength === void 0)
+      mutateStrength = 0.5;
+    if (crossoverProp === void 0)
+      crossoverProp = 0.4;
+    if (crossoverFreq === void 0)
+      crossoverFreq = 0.8;
+    if (maxCrossover === void 0)
+      maxCrossover = 0.3;
+    this.mutateProp = mutateProp;
+    this.mutateFreq = mutateFreq;
+    this.mutateStrength = mutateStrength;
+    this.crossoverProp = crossoverProp;
+    this.crossoverFreq = crossoverFreq;
+    this.maxCrossover = maxCrossover;
   }
   function Genetic$run$lambda(closure$wheel) {
     return function (it) {
@@ -195,15 +213,15 @@ var js_main = function (_, Kotlin) {
     var tmp$;
     for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var element = $receiver[tmp$];
-      if (Math.random() < mutateProp)
-        element.mutate_lu1900$(mutateFreq, mutateStrength);
+      if (Math.random() < this.mutateProp)
+        element.mutate_lu1900$(this.mutateFreq, this.mutateStrength);
     }
     var $receiver_0 = pool.data;
     var tmp$_0;
     for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
       var element_0 = $receiver_0[tmp$_0];
-      if (Math.random() < crossoverProp)
-        element_0.crossover_lu1900$(crossoverFreq, maxCrossover);
+      if (Math.random() < this.crossoverProp)
+        element_0.crossover_lu1900$(this.crossoverFreq, this.maxCrossover);
     }
     var $receiver_1 = pool.data;
     var tmp$_1;
@@ -219,18 +237,22 @@ var js_main = function (_, Kotlin) {
     interfaces: []
   };
   function GradientDescent() {
-    this.friction = 0;
-    this.learningRate = 0;
-    this.descentStrategy = null;
   }
-  GradientDescent.prototype.run = function () {
-    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3, tmp$_4;
-    var eps = 1.0E-4;
+  GradientDescent.$metadata$ = {
+    kind: Kotlin.Kind.INTERFACE,
+    simpleName: 'GradientDescent',
+    interfaces: []
+  };
+  function SGD(learningRate) {
+    this.learningRate = learningRate;
+  }
+  SGD.prototype.run = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
     tmp$ = cs.data_8be2vx$.iterator();
     while (tmp$.hasNext()) {
-      var tmp$_5 = tmp$.next();
-      var x = tmp$_5.component1()
-      , y = tmp$_5.component2();
+      var tmp$_4 = tmp$.next();
+      var x = tmp$_4.component1()
+      , y = tmp$_4.component2();
       var error;
       tmp$_0 = until(0, best.poly.betas.length);
       tmp$_1 = tmp$_0.first;
@@ -238,45 +260,57 @@ var js_main = function (_, Kotlin) {
       tmp$_3 = tmp$_0.step;
       for (var i = tmp$_1; i <= tmp$_2; i += tmp$_3) {
         error = y - best.poly.eval_14dthe$(x);
-        tmp$_4 = this.descentStrategy;
-        if (Kotlin.equals(tmp$_4, DescentStrategy$Momentum_getInstance())) {
-          best.poly.velos[i] = best.poly.velos[i] * this.friction + this.learningRate * best.poly.gradient_12fank$(x, i) * error;
-          best.poly.betas[i] = best.poly.betas[i] + best.poly.velos[i];
-        }
-         else if (Kotlin.equals(tmp$_4, DescentStrategy$SGD_getInstance()))
-          best.poly.betas[i] = best.poly.betas[i] + best.poly.gradient_12fank$(x, i) * error * this.learningRate;
-        else if (Kotlin.equals(tmp$_4, DescentStrategy$Adagrad_getInstance())) {
-          var dx = best.poly.gradient_12fank$(x, i);
-          best.poly.cache[i] = best.poly.cache[i] + dx * dx;
-          best.poly.betas[i] = best.poly.betas[i] + -(dx * error * this.learningRate) / (Math.sqrt(best.poly.cache[i]) + eps);
-        }
+        best.poly.betas[i] = best.poly.betas[i] + best.poly.gradient_12fank$(x, i) * error * this.learningRate;
       }
     }
   };
-  GradientDescent.$metadata$ = {
+  SGD.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
-    simpleName: 'GradientDescent',
+    simpleName: 'SGD',
+    interfaces: [GradientDescent]
+  };
+  function Momentum(learningRate, friction) {
+    this.learningRate = learningRate;
+    this.friction = friction;
+    this.velos_0 = Kotlin.newArrayF(order, Momentum$velos$lambda);
+  }
+  Momentum.prototype.run = function () {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
+    tmp$ = cs.data_8be2vx$.iterator();
+    while (tmp$.hasNext()) {
+      var tmp$_4 = tmp$.next();
+      var x = tmp$_4.component1()
+      , y = tmp$_4.component2();
+      var error;
+      tmp$_0 = until(0, best.poly.betas.length);
+      tmp$_1 = tmp$_0.first;
+      tmp$_2 = tmp$_0.last;
+      tmp$_3 = tmp$_0.step;
+      for (var i = tmp$_1; i <= tmp$_2; i += tmp$_3) {
+        error = y - best.poly.eval_14dthe$(x);
+        this.velos_0[i] = this.velos_0[i] * this.friction + this.learningRate * best.poly.gradient_12fank$(x, i) * error;
+        best.poly.betas[i] = best.poly.betas[i] + this.velos_0[i];
+      }
+    }
+  };
+  function Momentum$velos$lambda(it) {
+    return 0.0;
+  }
+  Momentum.$metadata$ = {
+    kind: Kotlin.Kind.CLASS,
+    simpleName: 'Momentum',
+    interfaces: [GradientDescent]
+  };
+  function Function() {
+  }
+  Function.$metadata$ = {
+    kind: Kotlin.Kind.INTERFACE,
+    simpleName: 'Function',
     interfaces: []
   };
-  function GradientDescent_init(friction, learningRate, descentStrategy, $this) {
-    if (friction === void 0)
-      friction = 0.95;
-    if (learningRate === void 0)
-      learningRate = 1.0E-4;
-    if (descentStrategy === void 0)
-      descentStrategy = DescentStrategy$Momentum_getInstance();
-    $this = $this || Object.create(GradientDescent.prototype);
-    GradientDescent.call($this);
-    $this.friction = friction;
-    $this.descentStrategy = descentStrategy;
-    $this.learningRate = learningRate;
-    return $this;
-  }
   function Polynomial() {
     this.order_0 = 0;
     this.betas = null;
-    this.velos = null;
-    this.cache = null;
   }
   Polynomial.prototype.eval_14dthe$ = function (x) {
     var tmp$, tmp$_0, tmp$_1, tmp$_2;
@@ -295,7 +329,7 @@ var js_main = function (_, Kotlin) {
   Polynomial.prototype.gradient_12fank$ = function (x, coefficient) {
     return Math.pow(x, coefficient);
   };
-  Polynomial.prototype.drawPoly_82vlsp$ = function (cs) {
+  Polynomial.prototype.draw = function () {
     var tmp$;
     var min = cs.minX;
     var max = cs.maxX;
@@ -316,45 +350,26 @@ var js_main = function (_, Kotlin) {
       line(p1.x, p1.y, p2.x, p2.y);
     }
   };
-  Polynomial.prototype.resetVelocity = function () {
-    var tmp$, tmp$_0, tmp$_1, tmp$_2;
-    tmp$ = until(0, this.velos.length);
-    tmp$_0 = tmp$.first;
-    tmp$_1 = tmp$.last;
-    tmp$_2 = tmp$.step;
-    for (var i = tmp$_0; i <= tmp$_1; i += tmp$_2)
-      this.velos[i] = 0.0;
-  };
   Polynomial.$metadata$ = {
     kind: Kotlin.Kind.CLASS,
     simpleName: 'Polynomial',
-    interfaces: []
+    interfaces: [Function]
   };
   function Polynomial_init(order, $this) {
     $this = $this || Object.create(Polynomial.prototype);
     Polynomial.call($this);
     $this.order_0 = order;
     $this.betas = Kotlin.newArrayF(order, Polynomial_init$lambda);
-    $this.velos = Kotlin.newArrayF(order, Polynomial_init$lambda_0);
-    $this.cache = Kotlin.newArrayF(order, Polynomial_init$lambda_1);
     return $this;
   }
   function Polynomial_init$lambda(it) {
     return randomBetween(Math, -5.0, 5.0);
   }
-  function Polynomial_init$lambda_0(it) {
-    return 0.0;
-  }
-  function Polynomial_init$lambda_1(it) {
-    return 0.0;
-  }
-  function Polynomial_init_0(order, betas, velos, cache, $this) {
+  function Polynomial_init_0(order, betas, $this) {
     $this = $this || Object.create(Polynomial.prototype);
     Polynomial.call($this);
     $this.order_0 = order;
     $this.betas = betas.slice();
-    $this.velos = velos.slice();
-    $this.cache = cache.slice();
     return $this;
   }
   function Pool() {
@@ -458,7 +473,7 @@ var js_main = function (_, Kotlin) {
     this.fitness = 1.0 / (1.0 + errorSq);
   };
   Specimen.prototype.copy = function () {
-    var clone = Polynomial_init_0(order, this.poly.betas, this.poly.velos, this.poly.cache);
+    var clone = Polynomial_init_0(order, this.poly.betas);
     return new Specimen(clone);
   };
   Specimen.prototype.mutate_lu1900$ = function (mutateFreq, strength) {
@@ -498,12 +513,6 @@ var js_main = function (_, Kotlin) {
   var order;
   var fps;
   var poolsize;
-  var mutateProp;
-  var mutateFreq;
-  var mutateStrength;
-  var crossoverProp;
-  var crossoverFreq;
-  var maxCrossover;
   var betterThreshold;
   var cs;
   var best;
@@ -530,11 +539,16 @@ var js_main = function (_, Kotlin) {
     fill(255);
     stroke(0);
     if (cs.data_8be2vx$.size > 1) {
+      var bestGenetic = genetic.run();
+      if (bestGenetic.fitness - best.fitness > betterThreshold) {
+        println('Best picked from genetic pool. If this happens too often, turn down learning');
+        best = bestGenetic.copy();
+      }
       descent.run();
       best.calcfitness();
       cs.drawGrid();
       cs.drawPoints();
-      best.poly.drawPoly_82vlsp$(cs);
+      best.poly.draw();
     }
      else {
       cs.drawGrid();
@@ -561,10 +575,12 @@ var js_main = function (_, Kotlin) {
   _.randomBetween_przh2b$ = randomBetween_0;
   _.binarySearch_taaqy$ = binarySearch;
   _.Genetic = Genetic;
-  _.GradientDescent_init_la7mwf$ = GradientDescent_init;
   _.GradientDescent = GradientDescent;
+  _.SGD = SGD;
+  _.Momentum = Momentum;
+  _.Function = Function;
   _.Polynomial_init_za3lpa$ = Polynomial_init;
-  _.Polynomial_init_ljcv17$ = Polynomial_init_0;
+  _.Polynomial_init_8cvqit$ = Polynomial_init_0;
   _.Polynomial = Polynomial;
   Object.defineProperty(Pool, 'Companion', {
     get: Pool$Companion_getInstance
@@ -595,36 +611,6 @@ var js_main = function (_, Kotlin) {
   Object.defineProperty(_, 'poolsize', {
     get: function () {
       return poolsize;
-    }
-  });
-  Object.defineProperty(_, 'mutateProp', {
-    get: function () {
-      return mutateProp;
-    }
-  });
-  Object.defineProperty(_, 'mutateFreq', {
-    get: function () {
-      return mutateFreq;
-    }
-  });
-  Object.defineProperty(_, 'mutateStrength', {
-    get: function () {
-      return mutateStrength;
-    }
-  });
-  Object.defineProperty(_, 'crossoverProp', {
-    get: function () {
-      return crossoverProp;
-    }
-  });
-  Object.defineProperty(_, 'crossoverFreq', {
-    get: function () {
-      return crossoverFreq;
-    }
-  });
-  Object.defineProperty(_, 'maxCrossover', {
-    get: function () {
-      return maxCrossover;
     }
   });
   Object.defineProperty(_, 'betterThreshold', {
@@ -669,19 +655,13 @@ var js_main = function (_, Kotlin) {
   _.draw = draw;
   width = 800.0;
   height = 600.0;
-  order = 3;
+  order = 4;
   fps = 0;
   poolsize = 1000;
-  mutateProp = 0.5;
-  mutateFreq = 0.4;
-  mutateStrength = 0.5;
-  crossoverProp = 0.4;
-  crossoverFreq = 0.8;
-  maxCrossover = 0.3;
   betterThreshold = 0.001;
   cs = CoordinateSystem_init();
   best = new Specimen(Polynomial_init(order));
-  descent = GradientDescent_init(0.99, 1.0E-7, DescentStrategy$Adagrad_getInstance());
+  descent = new Momentum(1.0E-5, 0.95);
   pool = Pool_init(poolsize);
   genetic = new Genetic();
   main([]);

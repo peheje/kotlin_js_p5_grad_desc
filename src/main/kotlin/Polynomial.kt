@@ -1,6 +1,12 @@
 import kotlin.js.Math
 
-class Polynomial {
+interface Function {
+    fun eval(x: Double): Double
+    fun gradient(x: Double, coefficient: Int): Double
+    fun draw()
+}
+
+class Polynomial: Function {
     private val order: Int
     val betas: DoubleArray
 
@@ -14,7 +20,7 @@ class Polynomial {
         this.betas = betas.copyOf()
     }
 
-    fun eval(x: Double): Double {
+    override fun eval(x: Double): Double {
         var sum = 0.0
         var p = 1.0
         for (i in 0 until betas.size) {
@@ -24,11 +30,11 @@ class Polynomial {
         return sum
     }
 
-    fun gradient(x: Double, coefficient: Int): Double {
+    override fun gradient(x: Double, coefficient: Int): Double {
         return Math.pow(x, coefficient.toDouble())
     }
 
-    fun drawPoly(cs: CoordinateSystem) {
+    override fun draw() {
         val min = cs.minX
         val max = cs.maxX
         val drawStep = 0.05
