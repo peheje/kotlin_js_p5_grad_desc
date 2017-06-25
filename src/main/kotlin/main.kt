@@ -3,7 +3,7 @@ import kotlin.js.Date
 val width: Double = 800.0
 val height: Double = 600.0
 
-val order: Int = 3
+val order: Int = 2
 val fps = 0
 val poolsize = 1000
 
@@ -19,7 +19,7 @@ val betterThreshold = 0.001
 
 val cs: CoordinateSystem = CoordinateSystem()
 var best: Specimen = Specimen(Polynomial(order))
-val descent: GradientDescent = GradientDescent(learningRate = 1e-7, friction = 0.99, descentStrategy = DescentStrategy.Adagrad)
+val descent: GradientDescent = Momentum(1e-3, 0.95)
 var pool: Pool = Pool(poolsize)
 val genetic: Genetic = Genetic()
 

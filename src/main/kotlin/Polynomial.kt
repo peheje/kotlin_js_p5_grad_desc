@@ -3,21 +3,15 @@ import kotlin.js.Math
 class Polynomial {
     private val order: Int
     val betas: DoubleArray
-    val velos: DoubleArray
-    val cache: DoubleArray
 
     constructor(order: Int) {
         this.order = order
         this.betas = DoubleArray(order) { Math.randomBetween(-5.0, 5.0) }
-        this.velos = DoubleArray(order) { 0.0 }     // For momentum
-        this.cache = DoubleArray(order) { 0.0 }     // For adagrad
     }
 
-    constructor(order: Int, betas: DoubleArray, velos: DoubleArray, cache: DoubleArray) {
+    constructor(order: Int, betas: DoubleArray) {
         this.order = order
         this.betas = betas.copyOf()
-        this.velos = velos.copyOf()
-        this.cache = cache.copyOf()
     }
 
     fun eval(x: Double): Double {
@@ -53,9 +47,5 @@ class Polynomial {
             val p2 = cs.toPixel(list[i+1])
             line(p1.x, p1.y, p2.x, p2.y)
         }
-    }
-
-    fun resetVelocity() {
-        for (i in 0 until velos.size) velos[i] = 0.0
     }
 }
