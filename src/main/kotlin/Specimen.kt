@@ -9,7 +9,7 @@ class Specimen (val poly: Polynomial) {
     }
 
     fun copy(): Specimen {
-        val clone = Polynomial(order, poly.betas, poly.velos)
+        val clone = Polynomial(order, poly.betas, poly.velos, poly.cache)
         return Specimen(clone)
     }
 

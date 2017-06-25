@@ -4,17 +4,20 @@ class Polynomial {
     private val order: Int
     val betas: DoubleArray
     val velos: DoubleArray
+    val cache: DoubleArray
 
     constructor(order: Int) {
         this.order = order
         this.betas = DoubleArray(order) { Math.randomBetween(-5.0, 5.0) }
-        this.velos = DoubleArray(order) { 0.0 }
+        this.velos = DoubleArray(order) { 0.0 }     // For momentum
+        this.cache = DoubleArray(order) { 0.0 }     // For adagrad
     }
 
-    constructor(order: Int, betas: DoubleArray, velos: DoubleArray) {
+    constructor(order: Int, betas: DoubleArray, velos: DoubleArray, cache: DoubleArray) {
         this.order = order
         this.betas = betas.copyOf()
         this.velos = velos.copyOf()
+        this.cache = cache.copyOf()
     }
 
     fun eval(x: Double): Double {
@@ -34,7 +37,7 @@ class Polynomial {
     fun drawPoly(cs: CoordinateSystem) {
         val min = cs.minX
         val max = cs.maxX
-        val drawStep = 0.1
+        val drawStep = 0.05
 
         var x: Double = min
         var y: Double

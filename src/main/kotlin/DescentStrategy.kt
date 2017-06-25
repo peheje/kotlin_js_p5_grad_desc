@@ -1,3 +1,5 @@
 enum class DescentStrategy {
-    SGD, Momentum, Nesterov
+    SGD, Momentum, Nesterov,
+
+    Adagrad
 }

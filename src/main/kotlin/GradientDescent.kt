@@ -1,18 +1,11 @@
 import kotlin.js.Math
 
-class GradientDescent {
-
-    val friction: Double
-    val learningRate: Double
-    val descentStrategy: DescentStrategy
-
-    constructor(friction: Double = 0.95, learningRate: Double = 0.0001, descentStrategy: DescentStrategy = DescentStrategy.Momentum) {
-        this.friction = friction
-        this.descentStrategy = descentStrategy
-        this.learningRate = learningRate
-    }
+class GradientDescent(val friction: Double = 0.95,
+                      val learningRate: Double = 0.0001,
+                      val descentStrategy: DescentStrategy = DescentStrategy.Momentum) {
 
     fun run() {
+        val eps = 1e-4
         for ((x, y) in cs.data) {
             var error: Double
             for (i in 0 until best.poly.betas.size) {
@@ -26,7 +19,12 @@ class GradientDescent {
                         best.poly.betas[i] += best.poly.velos[i]
                     }
                     DescentStrategy.SGD -> {
-                        best.poly.betas[i] += best.poly.gradient(x, i) * error * learningRate;
+                        best.poly.betas[i] += best.poly.gradient(x, i) * error * learningRate
+                    }
+                    DescentStrategy.Adagrad -> {
+                        val dx = best.poly.gradient(x, i)
+                        best.poly.cache[i] += dx*dx
+                        best.poly.betas[i] += - (dx * error * learningRate) / (Math.sqrt(best.poly.cache[i]) + eps)
                     }
                 }
 
