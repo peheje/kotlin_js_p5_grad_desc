@@ -1,14 +1,16 @@
 // Bridge between p5 and Kotlin
 // Simply declare p5 global functions and call the correct kotlin function.
 
+var name = "GitRepos-js_main";
+
 function setup() {
-    js_main.setup()
+    window[name].setup()
 }
 
 function draw() {
-    js_main.draw()
+    window[name].draw()
 }
 
 function mousePressed() {
-    js_main.mousePressed()
+    window[name].mousePressed()
 }
